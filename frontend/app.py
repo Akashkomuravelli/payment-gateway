@@ -27,7 +27,7 @@ if st.button("💰 Pay ₹500", use_container_width=True):
 
     try:
         response = requests.post(
-            "http://127.0.0.1:8000/payment/create",
+            "https://payment-gateway-0jov.onrender.com/payment/create",
             json={
                 "amount": 500,
                 "currency": "INR"

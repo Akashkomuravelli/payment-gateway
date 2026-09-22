@@ -1,0 +1,7 @@
+streamlit
+fastapi
+uvicorn
+pydantic
+python-dotenv
+razorpay
+sqlalchemy

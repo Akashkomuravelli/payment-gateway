@@ -1,8 +1,7 @@
 import streamlit as st
 import requests
 
-BACKEND_URL = "https://payment-gateway-0jov.onrender.com"
-
+BACKEND_URL = "https://payment-gateway-backend-vmtw.onrender.com"
 st.set_page_config(
     page_title="Payment Gateway",
     page_icon="💳",

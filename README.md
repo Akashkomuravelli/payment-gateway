@@ -80,6 +80,18 @@ database and payment-history workflow without processing real money.
 Backend:
 Render
 
+
+## 🌐 Live Demo
+
+**Frontend (Streamlit):**  
+https://falowk7ip5xwq8gsqy7zew.streamlit.app/
+
+**Backend (FastAPI):**  
+https://payment-gateway-backend-vmtw.onrender.com
+
+**API Documentation (Swagger):**  
+https://payment-gateway-backend-vmtw.onrender.com/docs
+
 Frontend:
 Streamlit Community Cloud
 

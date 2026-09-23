@@ -1,58 +1,198 @@
 import streamlit as st
 import requests
 
+BACKEND_URL = "https://payment-gateway-0jov.onrender.com"
+
 st.set_page_config(
     page_title="Payment Gateway",
     page_icon="💳",
     layout="centered"
 )
 
-st.title("💳 Payment Gateway Demo")
-
-st.write(
-    "A payment application built using "
-    "Python, FastAPI and Streamlit."
-)
+st.title("💳 Payment Gateway")
+st.caption("Razorpay Test Mode Payment System")
 
 st.divider()
 
-st.subheader("🛒 Product")
+# -------------------------
+# Product
+# -------------------------
 
-st.write("Premium Course")
-st.write("Learn Python, FastAPI and Generative AI.")
+st.subheader("🎓 Premium Course")
 
-st.markdown("### Price: ₹500")
+st.write("Complete Python & Backend Development Course")
 
-if st.button("💰 Pay ₹500", use_container_width=True):
+st.markdown("### ₹500")
+
+st.divider()
+
+# -------------------------
+# Create Payment
+# -------------------------
+
+st.subheader("💰 Make Payment")
+
+if st.button(
+    "💳 Create Payment Order",
+    use_container_width=True
+):
 
     try:
         response = requests.post(
-            "https://payment-gateway-0jov.onrender.com/payment/create",
+            f"{BACKEND_URL}/payment/create",
             json={
                 "amount": 500,
                 "currency": "INR"
-            }
+            },
+            timeout=30
         )
 
         if response.status_code == 200:
 
             data = response.json()
 
-            st.success("Payment order created!")
+            order_id = data["order_id"]
 
-            st.write("Amount:", data["amount"], "paise")
-            st.write("Currency:", data["currency"])
+            st.session_state["order_id"] = order_id
+
+            st.success("Payment order created successfully!")
+
+            st.code(order_id)
+
+            checkout_url = (
+                f"{BACKEND_URL}/checkout/{order_id}"
+            )
+
+            st.link_button(
+                "💳 Open Razorpay Checkout",
+                checkout_url,
+                use_container_width=True
+            )
 
         else:
-            st.error("Unable to create payment order.")
 
-    except requests.exceptions.ConnectionError:
+            st.error("Failed to create payment order.")
+            st.write(response.text)
+
+    except Exception as e:
+
         st.error(
-            "FastAPI backend is not running."
+            f"Backend connection error: {e}"
         )
+
+
+# -------------------------
+# Development Test Payment
+# -------------------------
 
 st.divider()
 
+st.subheader("🧪 Development Testing")
+
 st.caption(
-    "Test payment application — no real payment is processed yet."
+    "Use this only to test the database/payment-history flow."
 )
+
+if "order_id" in st.session_state:
+
+    if st.button(
+        "✅ Simulate Test Payment",
+        use_container_width=True
+    ):
+
+        try:
+
+            order_id = st.session_state["order_id"]
+
+            response = requests.post(
+                f"{BACKEND_URL}/payment/test-success/{order_id}",
+                timeout=30
+            )
+
+            if response.status_code == 200:
+
+                data = response.json()
+
+                if data["status"] == "test_paid":
+
+                    st.success(
+                        "Development payment recorded successfully!"
+                    )
+
+                else:
+
+                    st.error(
+                        "Test payment failed."
+                    )
+
+            else:
+
+                st.error(
+                    "Unable to simulate payment."
+                )
+
+                st.write(response.text)
+
+        except Exception as e:
+
+            st.error(
+                f"Error: {e}"
+            )
+
+else:
+
+    st.info(
+        "Create a payment order first."
+    )
+
+
+# -------------------------
+# Payment History
+# -------------------------
+
+st.divider()
+
+st.subheader("📜 Payment History")
+
+if st.button(
+    "🔄 Refresh Payment History",
+    use_container_width=True
+):
+
+    try:
+
+        response = requests.get(
+            f"{BACKEND_URL}/payments",
+            timeout=30
+        )
+
+        if response.status_code == 200:
+
+            data = response.json()
+
+            payments = data["payments"]
+
+            if payments:
+
+                st.dataframe(
+                    payments,
+                    use_container_width=True
+                )
+
+            else:
+
+                st.info(
+                    "No payments found."
+                )
+
+        else:
+
+            st.error(
+                "Unable to load payment history."
+            )
+
+    except Exception as e:
+
+        st.error(
+            f"Error: {e}"
+        )
